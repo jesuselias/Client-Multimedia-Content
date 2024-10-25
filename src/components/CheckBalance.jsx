@@ -20,7 +20,7 @@ const CheckBalance = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:4000/api/check-balance?document=${formData.documento}&fullPhone=${formData.celular}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/check-balance?document=${formData.documento}&fullPhone=${formData.celular}`);
       
       if (response.data.status === 'success') {
         setSaldo(response.data.balance);
