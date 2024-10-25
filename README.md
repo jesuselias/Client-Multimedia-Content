@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# REACT
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Documentación:
 
-## Available Scripts
+Aplicación web para gestionar billeteras virtuales, estructa sencilla de components y router con una patantalla principal, desarrollada con React y conectada a un backend.
 
-In the project directory, you can run:
+cumple con la siguiente Funcionalidades:
 
-### `npm start`
+1. Registro Clientes:
+    Crear un método llamado registro cliente donde reciba los siguientes parámetros:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+        • Documento
+        • Nombres,
+        • Email,        
+        • Celular
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    Se debe registrar el usuario, todos los campos son requeridos, el servicio debe
+    dar como resultado un mensaje con su respectivo código de error y mensaje de
+    éxito o fallo.
 
-### `npm test`
+2. Recarga Billetera:
+    Se debe permitir cargar la billetera enviando el documento, número de celular y
+    valor, se debe responder un mensaje de éxito o fallo.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Pagar:
+    La billetera con saldo debe permitir pagar una compra enviada, pero para
+    descontar el saldo el sistema deberá generar un token de 6 dígitos el cual deben
+    de confirmar enviando un id de sesión y el token. Se sugiere enviar el token al
+    email del usuario registrado.
+    Si todo es correcto se genera un mensaje y una respuesta diciendo que se ha
+    enviado un correo más el id de sesión que debe ser usado en la confirmación de
+    la compra.
 
-### `npm run build`
+    Confirmar Pago.
+    Esta función valida el id de sesión generado en la compra, valida el token enviado
+    al usuario al correo, si es correcto el dinero se descuenta de la billetera y se
+    genera el respectivo mensaje de éxito o fallo.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4. Consultar Saldo.
+    Para consultar el saldo se debe enviar el documento y numero de celular, estos
+    dos valores deben coincidir.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# para ejecutar el backend:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+instalar dependencia:
 
-### `npm run eject`
+- En la terminal de la raiz del proyecto:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    ```bash    
+    npm install
+    ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- ejecutar proyecto con:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+    ```bash    
+    npm run start
+    ```
