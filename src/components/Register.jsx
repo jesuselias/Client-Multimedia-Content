@@ -5,10 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 const RegisterClient = () => {
   const [formData, setFormData] = useState({
-    documento: '',
-    nombres: '',
+    username: '',
     email: '',
-    celular: ''
+    password: '',
+    role: ''
   });
   const [message, setMessage] = useState('');
 
@@ -21,7 +21,7 @@ const RegisterClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, formData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/register`, formData);
       setMessage(response.data.message);
     } catch (error) {
       setMessage(error.response ? error.response.data.message : 'Ocurrió un error al registrar al cliente.');
@@ -31,38 +31,28 @@ const RegisterClient = () => {
   const handleBack = () => {
     setMessage('');
     setFormData({
-      documento: '',
-      nombres: '',
+      username: '',
       email: '',
-      celular: ''
+      password: '',
+      role: ''
     });
-    navigate('/'); // Redirigir a la página principal
+    navigate('/');
   };
 
   return (
     <Container>
       <FormContainer>
-        <h2>Registro de Cliente</h2>
+        <h2>Registro de Usuario</h2>
         <Row>
           <Column>
             <Input
               type="text"
-              name="documento"
-              value={formData.documento}
+              name="username"
+              value={formData.username}
               onChange={handleChange}
-              placeholder="Documento"
+              placeholder="Nombre de usuario"
               required
             />
-            <Input
-              type="text"
-              name="nombres"
-              value={formData.nombres}
-              onChange={handleChange}
-              placeholder="Nombres"
-              required
-            />
-          </Column>
-          <Column>
             <Input
               type="email"
               name="email"
@@ -72,13 +62,23 @@ const RegisterClient = () => {
               required
             />
             <Input
-              type="tel"
-              name="celular"
-              value={formData.celular}
+              type="password"
+              name="password"
+              value={formData.password}
               onChange={handleChange}
-              placeholder="Número de teléfono"
+              placeholder="Contraseña"
               required
             />
+            <Select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccione un rol</option>
+              <option value="Lector">Lector</option>
+              <option value="Creador">Creador</option>
+            </Select>
           </Column>
         </Row>
         <Button onClick={handleBack} style={{marginRight: '10px'}}>Regresar</Button>
@@ -94,7 +94,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
 `;
 
 const FormContainer = styled.div`
@@ -102,14 +102,16 @@ const FormContainer = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 40%;
+  width: 25%;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 const Column = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: calc(50% - 20px);
+  width: 100%;
 `;
 
 const Row = styled.div`
@@ -118,6 +120,20 @@ const Row = styled.div`
 `;
 
 const Input = styled.input`
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
+const Select = styled.select`
   display: block;
   margin-bottom: 10px;
   padding: 10px;

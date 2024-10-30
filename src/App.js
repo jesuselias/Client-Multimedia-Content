@@ -1,58 +1,65 @@
-import React from 'react';
-import './App.css';
-import styled from 'styled-components';
-import billetera from './assets/img/billetera.png';
+// src/App.js
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Register from './components/Register'; 
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import DashboardHome from './components/DashboardHome';
+import CreateCategory from './components/CreateCategory';
+import CreateThemes from './components/CreateThemes';
+import CreateContents from './components/CreateContents';
+import ThemeSearcher from './components/ThemeSearcher';
+import ContentSearcher from './components/ContentSearch';
 
-// Estilos para el contenedor principal
-const AppContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-// Estilos para el botón personalizado
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
-`;
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState('');
+  const [token, setToken] = useState('');
+  const [username, setUsername] = useState('');
+
+  const handleLoginSuccess = (data) => {
+    localStorage.setItem('token', data.token);
+    setIsLoggedIn(true);
+    setRole(data.user.role);
+    setToken(data.token);
+    console.log("data.user",data.user)
+    setUsername(data.user.username)
+    console.log('Logged in successfully:', data.token, data.user.role);
+  };
+
   return (
-    <AppContainer>
-       <img src={billetera} alt="Billetera" style={{width: '100%', maxWidth: '117px'}} />
-      <h1>Billetera Virtual</h1>
-      <div className="button-group">
-         <StyledButton onClick={() => window.location.href = '/register'}>
-          Registro Clientes
-        </StyledButton>
-        <StyledButton onClick={() => window.location.href = '/reload-wallet'}>
-          Recarga Billetera
-        </StyledButton>
-        <StyledButton onClick={() => window.location.href = '/pay'}>
-          Pagar
-        </StyledButton>
-        <StyledButton onClick={() => window.location.href = '/check-balance'}>
-          Consultar Saldo
-        </StyledButton>
-      </div>
-    </AppContainer>
+    <Router>
+      <Routes>
+        {/* Rutas de autenticación */}
+        <Route path="/login" element={
+          isLoggedIn ? <Navigate to="/dashboard" /> : <Login onSuccess={handleLoginSuccess} />
+        } />
+
+        <Route path="/register" element={<Register />} /> 
+
+        {/* Rutas protegidas */}
+        <Route path="/dashboard" element={
+          isLoggedIn ? <Dashboard isLoggedIn={isLoggedIn} role={role} token={token} username={username}  /> : <Navigate to="/login" />
+        }>
+            <Route index element={<DashboardHome 
+              isLoggedIn={isLoggedIn}
+              role={role} 
+              token={token}
+              username={username} 
+            />} />
+        <Route path="create-category" element={<CreateCategory />} />
+        <Route path="create-themes" element={<CreateThemes />} />
+        <Route path="create-contents" element={<CreateContents />} />
+        <Route path="search-theme" element={<ThemeSearcher />} />
+        <Route path="search-content" element={<ContentSearcher />} />
+         
+        </Route>
+
+        {/* Ruta por defecto */}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </Router>
   );
 }
 

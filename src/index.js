@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import AppRouter from './router/AppRouter'; // Importamos el nuevo componente AppRouter
+import App from './App'; // Importamos el nuevo componente client-multimedia-content
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AppRouter />
+    <App />
   </React.StrictMode>
 );
 
