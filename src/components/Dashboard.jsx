@@ -96,7 +96,6 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
       { label: 'Crear Categoría', path: '/dashboard/create-category' },
       { label: 'Crear Tematica', path: '/dashboard/create-themes' },
-      { label: 'User Management', path: '/dashboard/' },
     ],
     Creador: [
       { label: 'Contenido Segun Temática', path: '/dashboard' },

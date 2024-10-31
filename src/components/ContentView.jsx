@@ -144,40 +144,6 @@ const ContentView = ({ themeId, token, username }) => {
     return mimeTypes[ext] || 'image/octet-stream';
   }
 
-  const DownloadButton = styled.button`
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-    function downloadFile(base64Data) {
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'text/plain' });
-
-    // Crear un enlace de descarga
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'archivo.txt';
-
-    // Agregar el enlace al documento y luego eliminarlo
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    }
-
   return (
     <Container>
       <Header>
@@ -213,11 +179,7 @@ const ContentView = ({ themeId, token, username }) => {
                   ) : content.type === 'video' ? (
                     <ContentVideo src={`https://www.youtube.com/embed/${new URL(content.videoUrl).searchParams.get('v')}`} title={content.title} />
                   ) : (
-                    <ContentText>
-                      {content.type === 'texto' && (
-                        <DownloadButton onClick={() => downloadFile(content.file.data)}>Descargar</DownloadButton>
-                      )}
-                    </ContentText>
+                    <ContentText>{content.text || "No hay texto disponible"}</ContentText>
                   )}
                   <ContentInfo>
                     <h4>{content.title}</h4>
@@ -233,8 +195,6 @@ const ContentView = ({ themeId, token, username }) => {
     </Container>
   );
 };
-
-
 
 const Container = styled.div`
   max-width: 1200px;
