@@ -69,7 +69,7 @@ function SelectInput({ name, value, onChange }) {
       <option value="">Seleccione categoria</option>
       <option value="imagen">imagen</option>
       <option value="video">video</option>
-      <option value="text">texto</option>
+      <option value="texto">texto</option>
     </select>
   );
 }

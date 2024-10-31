@@ -1,7 +1,7 @@
-// src/components/ContentView.jsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { Buffer } from 'buffer';
 
 const ContentView = ({ themeId, token, username }) => {
   const [contents, setContents] = useState([]);
@@ -9,52 +9,48 @@ const ContentView = ({ themeId, token, username }) => {
   const [totalVideos, setTotalVideos] = useState(0);
   const [totalTexts, setTotalTexts] = useState(0);
   const [error, setError] = useState(null);
+  const [loadImages, setLoadImages] = useState({});
 
   useEffect(() => {
     const fetchContents = async () => {
+      console.log("URL de contenido:", `${process.env.REACT_APP_API_URL}/api/user/content/${themeId}`);
+      console.log("Token de autenticación:", token);
+      
+      if (!themeId) {
+        return; // Salimos si no hay un themeId válido
+      }
+
+      const url = `${process.env.REACT_APP_API_URL}/api/user/content/${themeId}`;
+      console.log("URL:", url);
+
       try {
-        console.log("token", token);
-        console.log("themeId", themeId);
-        
-        if (!themeId) {
-          return; // Salimos si no hay un themeId válido
-        }
-
-        const url = `${process.env.REACT_APP_API_URL}/api/user/content/${themeId}`;
-        console.log("URL:", url);
-
-        const response = await fetch(url, {
-          method: 'GET',
+        const response = await axios.get(url, {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${token}`,
           }
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("data", data);
+        console.log("data", response.data);
         
-        if (Array.isArray(data)) {
-          setContents(data);
+        if (Array.isArray(response.data)) {
+          setContents(response.data);
         } else {
           setError("La respuesta no es un array");
         }
       } catch (error) {
         console.error('Error fetching contents:', error);
-        setError(error.message || 'Error al obtener los contenidos');
+        setError('Error al obtener los contenidos');
       }
     };
 
     const fetchTotals = async () => {
-      try {
-        if (!themeId) {
-          return; // Salimos si no hay un themeId válido
-        }
+      console.log("URL de totales:", `${process.env.REACT_APP_API_URL}/api/user/content-totals}`);
+      
+      if (!themeId) {
+        return; // Salimos si no hay un themeId válido
+      }
 
+      try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/content-totals`);
         console.log("response totals", response);
         setTotalImages(response.data.images);
@@ -62,18 +58,125 @@ const ContentView = ({ themeId, token, username }) => {
         setTotalTexts(response.data.texts);
       } catch (error) {
         console.error('Error fetching totals:', error);
-        setError('Error al obtener los totales');
+        setError('Error al obtener los totales de contenidos');
       }
     };
-    
+
     fetchContents();
     fetchTotals();
   }, [themeId, token]);
 
   useEffect(() => {
-    console.log("contents actualizados:", contents);
-    console.log('URL imagen:', `${process.env.REACT_APP_API_URL}/api/files/${contents.imageUrl}`);
+    const loadImages = async () => {
+      console.log("Comenzando a cargar imágenes");
+      console.log("contents", contents);
+      
+      const promises = contents.map(async (content) => {
+        console.log("Procesando contenido:", content);
+        try {
+          if (content.type === 'imagen') {
+            const buffer = Buffer.from(content.file.data, 'base64');
+            const imageType = getMimeType(content.title);
+            
+            
+            return {
+              id: content._id,
+              url: `data:${imageType};base64,${buffer.toString('base64')}`
+            };
+          } else if (content.type === 'texto') {
+            console.log(`Texto: ${content.title}`);
+            return { id: content._id.$oid, type: 'text' };
+          }
+          
+          console.log("Tipo de contenido no soportado");
+          return null;
+        } catch (error) {
+          console.error('Error procesando contenido:', error);
+          return null;
+        }
+      });
+      
+      const results = Promise.all(promises);
+      
+      return results.then(results => {
+        const newContentUrls = {};
+        results.forEach((result) => {
+          if (result && result.url) {
+            newContentUrls[result.id] = result.url;
+            console.log(`Cargado: ${JSON.stringify(result)}`);
+          } else {
+            console.log(`No se pudo cargar: ${JSON.stringify(result)}`);
+          }
+        });
+        return newContentUrls;
+      });
+    };
+
+    loadImages().then(images => {
+      console.log("Imágenes cargadas:", images);
+      setLoadImages(images);
+    }).catch(error => {
+      console.error("Error al cargar imágenes:", error);
+    });
   }, [contents]);
+
+  function getMimeType(filename) {
+    const mimeTypes = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.svg': 'image/svg+xml',
+      '.pdf': 'application/pdf',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      '.txt': 'text/plain',
+      '.csv': 'text/csv',
+      '.json': 'application/json',
+      '.xml': 'application/xml',
+      '.html': 'text/html',
+      '.css': 'text/css',
+      '.js': 'text/javascript'
+    };
+  
+    const ext = '.' + filename.split('.').pop();
+    return mimeTypes[ext] || 'image/octet-stream';
+  }
+
+  const DownloadButton = styled.button`
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+    function downloadFile(base64Data) {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'text/plain' });
+
+    // Crear un enlace de descarga
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'archivo.txt';
+
+    // Agregar el enlace al documento y luego eliminarlo
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    }
 
   return (
     <Container>
@@ -95,37 +198,42 @@ const ContentView = ({ themeId, token, username }) => {
             </TotalsList>
           </TotalsContainer>
           <ContentsContainer>
-        <h3>Listado de contenidos</h3>
-          <ContentsList>
-            {contents.map((content, index) => (
-              <ContentItem key={index}>
-              {content.type === 'image' ? (
+            <h3>Listado de contenidos</h3>
+            <ContentsList>
+              {contents.map((content, index) => (
+                <ContentItem key={index}>
+                  {content.type === 'imagen' ? (
                     <ContentImage
-                      src="http://localhost:4000/api/files/1730237630753_billetera.png"
-                      alt={content.title} 
+                      src={loadImages[content._id]}
+                      alt={content.title}
                       onError={(e) => {
-                        e.target.src = '/path/to/default-image.jpg'; // Reemplaza esto con la ruta real a una imagen predeterminada
+                        e.target.src = require('../assets/img/logo-multimedia.png');
                       }}
                     />
                   ) : content.type === 'video' ? (
-                  <ContentVideo src={`https://www.youtube.com/embed/${new URL(content.videoUrl).searchParams.get('v')}`} title={content.title} />
-                ) : (
-                  <ContentText>{content.text || "No hay texto disponible"}</ContentText>
-                )}
-                <ContentInfo>
-                  <h4>{content.title}</h4>
-                  <p>{content.description || "No hay descripción disponible"}</p>
-                  <small>Creador: {content.credits || "Creador desconocido"}</small>
-                </ContentInfo>
-              </ContentItem>
-            ))}
-          </ContentsList>
-        </ContentsContainer>
+                    <ContentVideo src={`https://www.youtube.com/embed/${new URL(content.videoUrl).searchParams.get('v')}`} title={content.title} />
+                  ) : (
+                    <ContentText>
+                      {content.type === 'texto' && (
+                        <DownloadButton onClick={() => downloadFile(content.file.data)}>Descargar</DownloadButton>
+                      )}
+                    </ContentText>
+                  )}
+                  <ContentInfo>
+                    <h4>{content.title}</h4>
+                    <p>{content.description || "No hay descripción disponible"}</p>
+                    <small>Creador: {content.credits || "Creador desconocido"}</small>
+                  </ContentInfo>
+                </ContentItem>
+              ))}
+            </ContentsList>
+          </ContentsContainer>
         </>
       )}
     </Container>
   );
 };
+
 
 
 const Container = styled.div`

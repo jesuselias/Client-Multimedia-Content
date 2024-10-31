@@ -222,7 +222,7 @@ function CreateContents({ token, userRole }) {
         }
       };
   
-      if (contentType === 'imagen' || contentType === 'text') {
+      if (contentType === 'imagen' || contentType === 'texto') {
         const formData = new FormData();
         
         formData.append('title', contentData.title);
@@ -263,7 +263,7 @@ function CreateContents({ token, userRole }) {
         <Header>Crear Contenido</Header>
         {message && <ErrorText>{message}</ErrorText>}
         <InputField
-          type="text"
+          type="texto"
           name="title"
           value={formData.title}
           onChange={handleChange}
@@ -283,7 +283,7 @@ function CreateContents({ token, userRole }) {
           ))}
         </Select>
         {errors.type && <ErrorText>{errors.type}</ErrorText>}
-        {contentType === 'imagen' || contentType === 'text' ? (
+        {contentType === 'imagen' || contentType === 'texto' ? (
           <InputField
             type="file"
             name="file"

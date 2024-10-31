@@ -4,19 +4,7 @@ import styled from 'styled-components';
 import ContentView from './ContentView'; // Import the existing ContentView component
 import axios from 'axios';
 
-const Button = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
 
 const DashboardContainer = styled.div`
   max-width: 800px;
@@ -55,10 +43,6 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
     setSelectedTheme(event.target.value);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  };
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -107,7 +91,6 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
         <ContentView themeId={selectedTheme} token={token} username={username} />
       </ContentWrapper>
 
-      <Button onClick={handleLogout}>Cerrar sesión</Button>
     </DashboardContainer>
   );
 };

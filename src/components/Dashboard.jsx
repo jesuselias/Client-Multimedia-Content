@@ -65,34 +65,55 @@ const Container = styled.div`
   width:100%
 `;
 
+const LogoutButton = styled.button`
+  background-color: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  margin-top: 600px;
+
+  &:hover {
+    background-color: #5a6268;
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+`;
+
 
 
 const Dashboard = ({ isLoggedIn, role, token, username }) => {
   const menuItems = {
     Admin: [
-      { label: 'Dashboard', path: '/dashboard' },
+      { label: 'Contenido Segun Temática', path: '/dashboard' },
+      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
+      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
       { label: 'Crear Categoría', path: '/dashboard/create-category' },
       { label: 'Crear Tematica', path: '/dashboard/create-themes' },
-      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
-      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
       { label: 'User Management', path: '/dashboard/' },
-      { label: 'Content Library', path: '/dashboard/content-library' },
-      { label: 'Search', path: '/dashboard/search' },
     ],
     Creador: [
-      { label: 'Dashboard', path: '/dashboard' },
-      { label: 'Create Content', path: '/dashboard/create-contents' },
+      { label: 'Contenido Segun Temática', path: '/dashboard' },
       { label: 'Buscar Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
-      { label: 'My Content', path: '/dashboard/my-content' },
-      { label: 'Content Library', path: '/dashboard/content-library' },
-      { label: 'Search', path: '/dashboard/search' },
+      { label: 'Create Content', path: '/dashboard/create-contents' },
     ],
     Lector: [
-      { label: 'Dashboard', path: '/dashboard' },
-      { label: 'Content Library', path: '/dashboard/content-library' },
-      { label: 'Search', path: '/dashboard/search' },
+      { label: 'Contenido Segun Temática', path: '/dashboard' },
+      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
+      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
     ],
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
   };
 
 
@@ -120,6 +141,7 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
             <p>No tienes permisos para ver este menú</p>
           )}
         </SidebarMenu>
+        <LogoutButton onClick={handleLogout}>Cerrar sesión</LogoutButton>
       </Sidebar>
       <ContentArea>
         <Container>
