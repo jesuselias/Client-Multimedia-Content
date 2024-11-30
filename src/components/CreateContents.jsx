@@ -139,7 +139,6 @@ function CreateContents({ token, userRole }) {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("response", response);
         if (response.data && Array.isArray(response.data.creators)) {
           setCreators(response.data.creators);
         } else {
@@ -213,7 +212,6 @@ function CreateContents({ token, userRole }) {
         credits: formData.credits
       };
   
-      console.log("contentData", JSON.stringify(contentData));
   
       let axiosConfig = {
         headers: {
@@ -230,6 +228,8 @@ function CreateContents({ token, userRole }) {
         formData.append('themeId', contentData.themeId);
         formData.append('creatorId', contentData.creatorId);
         formData.append('credits', contentData.credits);
+
+        console.log("file",file)
         
         // Append the file
         formData.append('file', file);
@@ -238,13 +238,13 @@ function CreateContents({ token, userRole }) {
           ...axiosConfig,
           headers: { ...axiosConfig.headers, 'Content-Type': 'multipart/form-data' }
         };
+
+        
   
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, formData, axiosConfig);
-        console.log("response", response.data);
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, formData, axiosConfig);
       } else if (contentType === 'video') {
         contentData.videoUrl = videoUrl;
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, contentData, axiosConfig);
-        console.log("response", response.data);
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, contentData, axiosConfig);
       }
   
       setMessage(<SuccessMessage>Contenido creado con éxito!</SuccessMessage>);
@@ -255,6 +255,18 @@ function CreateContents({ token, userRole }) {
       setMessage('Error al crear el contenido');
     }
   };
+
+  function covertToBase64(e) {
+    console.log(e)
+    var reader = new FileReader();
+    console.log("console.log(e.target.files[0])",console.log(e.target.files[0]))
+    reader.readAsDataURL(e.target.files[0])
+    console.log(e.target.files[0])
+    reader.onload = () => {
+      console.log(reader.result)
+      setFile(reader.result)
+    }
+  }
 
 
   return (
@@ -285,9 +297,10 @@ function CreateContents({ token, userRole }) {
         {errors.type && <ErrorText>{errors.type}</ErrorText>}
         {contentType === 'imagen' || contentType === 'texto' ? (
           <InputField
+            accept="image/*" 
             type="file"
             name="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={covertToBase64}
             required
           />
         ) : contentType === 'video' ? (

@@ -23,9 +23,7 @@ function App() {
     setIsLoggedIn(true);
     setRole(data.user.role);
     setToken(data.token);
-    console.log("data.user",data.user)
     setUsername(data.user.username)
-    console.log('Logged in successfully:', data.token, data.user.role);
   };
 
   return (

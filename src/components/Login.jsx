@@ -64,13 +64,10 @@ function Login({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Intentando iniciar sesión...');
       
       // Aquí iría la lógica real para enviar una solicitud POST al servidor
       const response = await axios.post('http://localhost:4000/api/user/login', credentials);
 
-      console.log('Respuesta del servidor:', response.data);
-      
       // Devolvemos un objeto con token y role
       onSuccess(response.data);
       navigate('/dashboard');

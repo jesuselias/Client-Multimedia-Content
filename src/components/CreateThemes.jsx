@@ -126,11 +126,9 @@ function CreateThemes({ token }) {
 
   const handleChangeCategory = (e) => {
     const { value } = e.target;
-    console.log("e.target", e.target);
-    console.log("value", value);
+
   
     setFormData(prevData => {
-      console.log("prevData", prevData);
       const newState = {
         ...prevData,
         permissions: prevData.permissions.map((permission, index) => {
@@ -145,7 +143,6 @@ function CreateThemes({ token }) {
         })
       };
   
-      console.log("newState", newState);
       return newState;
     });
   };
@@ -195,9 +192,6 @@ function CreateThemes({ token }) {
   };
 
   const handleContentPermission = (field, isChecked) => {
-    console.log("field", field);
-    console.log("isChecked", isChecked);
-  
     setFormData(prevData => ({
       ...prevData,
       permissions: prevData.permissions.map((permission, index) => {
@@ -214,7 +208,6 @@ function CreateThemes({ token }) {
   };
 
   const addPermission = () => {
-    console.log('Agregar Permiso llamado'); // Agrega esto para verificar
     setFormData(prevData => ({
       ...prevData,
       permissions: [...prevData.permissions, { category: '', read: false, write: false }]
@@ -233,15 +226,12 @@ function CreateThemes({ token }) {
     { value: "matematicas", label: "Matemáticas" },
     { value: "deporte", label: "Deporte" }
   ];
-  console.log("categories",categories)
 
   const categoryOptions = categories.map(category => ({
     value: category._id,
     label: category.name
   }));
 
-  console.log("categoryOptions",categoryOptions)
-  console.log("formData",formData)
 
   return (
     <Container>

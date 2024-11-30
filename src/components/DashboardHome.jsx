@@ -7,7 +7,7 @@ import axios from 'axios';
 
 
 const DashboardContainer = styled.div`
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
@@ -15,12 +15,12 @@ const DashboardContainer = styled.div`
 
 const Header = styled.header`
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 0px;
 `;
 
 const Select = styled.select`
   width: 200px;
-  margin: 0 auto 20px;
+  margin: 0 auto 2px;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -31,10 +31,10 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%; // Asegura que ocupe todo el ancho disponible
 `;
 
 const DashboardHome = ({ isLoggedIn, role, token, username }) => {
-  console.log("akkkkaaaa",username)
   const [themes, setThemes] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState('');
 
@@ -64,16 +64,23 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
   return (
     <DashboardContainer>
       <Header>
-        <h2>Bienvenido al dashboard</h2>
-        {isLoggedIn ? (
-          <>
-            <h3>Tu rol: {role}</h3>
-            <p>En el menu lateral podras ver tu el menu de opciones dependiendo de tu Rol: {role} </p>
-          </>
-        ) : (
-          <p>No estás autorizado para acceder a este dashboard.</p>
-        )}
-      </Header>
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '30px',
+          display: 'inline-flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+    {isLoggedIn ? (
+      <>
+        <h2 style={{ marginRight: '10px' }}>Bienvenido:</h2>
+        <h2 style={{ color: '#4CAF50', fontWeight: 'bold' }}>{role}</h2>
+      </>
+    ) : (
+      <span style={{ color: '#f44336', fontWeight: 'bold' }}>No estás autorizado para acceder a este dashboard.</span>
+    )}
+  </div>
+</Header>
 
 
       <Select

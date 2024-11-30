@@ -117,11 +117,6 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
 
 
   const currentRole = role;
-  console.log("currentRole",currentRole);
-
-
-
-  console.log("isLoggedIn",isLoggedIn);
 
   const location = useLocation();
 
