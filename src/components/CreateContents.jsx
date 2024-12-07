@@ -91,7 +91,7 @@ function CreateContents({ token, userRole }) {
   const [formData, setFormData] = useState({
     title: '',
     type: '',
-    url: '',
+    videoUrl: '',
     themeId: '',
     creatorId: '',
     credits: '',
@@ -102,8 +102,9 @@ function CreateContents({ token, userRole }) {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [contentType, setContentType] = useState('');
-  const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [videoUrl, setvideoUrl] = useState('');
+  const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
 
 
@@ -212,15 +213,17 @@ function CreateContents({ token, userRole }) {
         credits: formData.credits
       };
   
-  
       let axiosConfig = {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data',
+          Accept: "application/json, text/plain, */*"
         }
       };
-  
-      if (contentType === 'imagen' || contentType === 'texto') {
+
+      //let fileContent;
+      let fileObject;
+      if (contentType === 'imagen' || contentType === 'archivo' || contentType === 'video') {
         const formData = new FormData();
         
         formData.append('title', contentData.title);
@@ -228,31 +231,32 @@ function CreateContents({ token, userRole }) {
         formData.append('themeId', contentData.themeId);
         formData.append('creatorId', contentData.creatorId);
         formData.append('credits', contentData.credits);
-
-        console.log("file",file)
-        
-        // Append the file
-        formData.append('file', file);
   
-        axiosConfig = {
-          ...axiosConfig,
-          headers: { ...axiosConfig.headers, 'Content-Type': 'multipart/form-data' }
-        };
-
-        
+        if (contentType === 'imagen') {
+          formData.append('image', image);
+        } else if (contentType === 'archivo') {
+        //  fileContent = file?.content;
+          fileObject = file?.originalFile;
+          formData.append('file', fileObject);
+        } else if (contentType === 'video') {
+          formData.append('videoUrl', videoUrl);
+        }
+  
+        console.log("formData", formData);
   
         await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, formData, axiosConfig);
-      } else if (contentType === 'video') {
-        contentData.videoUrl = videoUrl;
-        await axios.post(`${process.env.REACT_APP_API_URL}/api/user/contents`, contentData, axiosConfig);
+      } else {
+        throw new Error('Tipo de contenido no válido');
       }
   
       setMessage(<SuccessMessage>Contenido creado con éxito!</SuccessMessage>);
-  
-      // Manejo de respuesta exitosa...
     } catch (error) {
       console.error('Error al crear el contenido:', error);
-      setMessage('Error al crear el contenido');
+      if (error.response && error.response.data) {
+        setMessage(`Error: ${error.response.data.message}`);
+      } else {
+        setMessage('Error al crear el contenido');
+      }
     }
   };
 
@@ -263,8 +267,45 @@ function CreateContents({ token, userRole }) {
     reader.readAsDataURL(e.target.files[0])
     console.log(e.target.files[0])
     reader.onload = () => {
-      console.log(reader.result)
-      setFile(reader.result)
+      console.log("aqui",reader.result)
+      setImage(reader.result)
+    }
+  }
+
+
+  function uploadFile(e) {
+    console.log("Event:", e);
+    console.log("Selected file:", e.target.files[0]);
+  
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        console.log("File contents:", reader.result);
+        setFile({ originalFile: file, content: reader.result });
+      };
+  
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+        setMessage('Error al leer el archivo seleccionado');
+      };
+  
+      reader.onabort = () => {
+        console.warn('File read aborted');
+        setMessage('Leer del archivo abortado');
+      };
+  
+      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // Para archivos .docx
+        reader.readAsDataURL(file);
+      } else if (file.type === 'text/plain') {
+        // Para archivos de texto plano (.txt)
+        reader.readAsText(file);
+      } else {
+        // Para otros tipos de archivos (incluyendo imágenes)
+        reader.readAsDataURL(file);
+      }
     }
   }
 
@@ -275,7 +316,7 @@ function CreateContents({ token, userRole }) {
         <Header>Crear Contenido</Header>
         {message && <ErrorText>{message}</ErrorText>}
         <InputField
-          type="texto"
+          //type="texto"
           name="title"
           value={formData.title}
           onChange={handleChange}
@@ -295,11 +336,11 @@ function CreateContents({ token, userRole }) {
           ))}
         </Select>
         {errors.type && <ErrorText>{errors.type}</ErrorText>}
-        {contentType === 'imagen' || contentType === 'texto' ? (
+        {contentType === 'imagen' ? (
           <InputField
             accept="image/*" 
             type="file"
-            name="file"
+            name="image"
             onChange={covertToBase64}
             required
           />
@@ -312,6 +353,13 @@ function CreateContents({ token, userRole }) {
             placeholder="URL de YouTube"
             required
           />
+        ) : contentType === 'archivo' ? (
+          <InputField
+          type="file"
+          name="file"
+          onChange={uploadFile}
+          required
+        />
         ) : null}
         {errors.url && <ErrorText>{errors.url}</ErrorText>}
         <Select

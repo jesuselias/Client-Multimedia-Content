@@ -238,11 +238,18 @@ function CreateThemes({ token }) {
       <CreateThemesForm onSubmit={handleSubmit}>
         <Header>Crear Nueva Temática</Header>
         {/* Seleccionar nombre de la temática */}
-         <SelectInput
+         {/* <SelectInput
           name="name"
           options={themeOptions}
           value={formData.name}
           onChange={handleChange}
+        /> */}
+        <InputField
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Nombre"
+          required
         />
         <InputField
           type="text"

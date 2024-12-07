@@ -91,17 +91,18 @@ const LogoutButton = styled.button`
 const Dashboard = ({ isLoggedIn, role, token, username }) => {
   const menuItems = {
     Admin: [
-      { label: 'Contenido Segun Temática', path: '/dashboard' },
-      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
-      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
       { label: 'Crear Categoría', path: '/dashboard/create-category' },
       { label: 'Crear Tematica', path: '/dashboard/create-themes' },
-    ],
-    Creador: [
+      { label: 'Create Content', path: '/dashboard/create-contents' },
       { label: 'Contenido Segun Temática', path: '/dashboard' },
       { label: 'Buscar Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
+    ],
+    Creador: [
       { label: 'Create Content', path: '/dashboard/create-contents' },
+      { label: 'Contenido Segun Temática', path: '/dashboard' },
+      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
+      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
     ],
     Lector: [
       { label: 'Contenido Segun Temática', path: '/dashboard' },
@@ -148,6 +149,9 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
                 token={token}
                 username={username} 
               />
+              )}
+              {location.pathname === '/dashboard/create-contents' && (
+                <CreateContents isLoggedIn={isLoggedIn} role={role} token={token} />
               )}
               {location.pathname === '/dashboard/create-category' && (
                 <CreateCategory isLoggedIn={isLoggedIn} role={role} token={token} />

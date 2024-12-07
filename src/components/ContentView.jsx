@@ -4,9 +4,6 @@ import axios from 'axios';
 
 const ContentView = ({ themeId, token, username }) => {
   const [contents, setContents] = useState([]);
-  const [totalImages, setTotalImages] = useState(0);
-  const [totalVideos, setTotalVideos] = useState(0);
-  const [totalTexts, setTotalTexts] = useState(0);
   const [error, setError] = useState(null);
   const [images, setImages] = useState({});
 
@@ -30,22 +27,9 @@ const ContentView = ({ themeId, token, username }) => {
       }
     };
 
-    const fetchTotals = async () => {
-      if (!themeId) return;
 
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/content-totals`);
-        setTotalImages(response.data.images);
-        setTotalVideos(response.data.videos);
-        setTotalTexts(response.data.texts);
-      } catch (error) {
-        console.error('Error fetching totals:', error);
-        setError('Error al obtener los totales de contenidos');
-      }
-    };
 
     fetchContents();
-    fetchTotals();
   }, [themeId, token]);
 
   useEffect(() => {
@@ -90,6 +74,61 @@ const ContentView = ({ themeId, token, username }) => {
     // eslint-disable-next-line
   }, [contents]);
 
+  const downloadFile = async (contentId) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/download-content/${contentId}`, {
+        responseType: 'blob',
+        timeout: 50000,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/octet-stream'
+        }
+      });
+  
+      console.log('Respuesta recibida:', response);
+  
+      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Establecer el nombre del archivo basándose en su tipo
+      let fileName = `archivo_${contentId}`;
+      if (response.headers['content-type'].includes('video')) {
+        fileName += '.mp4';
+      } else if (response.headers['content-type'].includes('audio')) {
+        fileName += '.mp3';
+      } else if (response.headers['content-type'].includes('pdf')) {
+        fileName += '.pdf';
+      }
+      
+      link.download = fileName;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+      console.log(`Archivo descargado correctamente: ${contentId}`);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      
+      let errorMessage = 'Ha ocurrido un error al descargar el archivo.';
+      if (axios.isCancel(error)) {
+        errorMessage += ' La operación ha sido cancelada.';
+      } else if (error.response) {
+        // El servidor respondió, pero con un estado de error
+        errorMessage += ` Código de error: ${error.response.status}, Mensaje: ${error.response.data}`;
+      } else if (error.request) {
+        // No se recibió respuesta desde el servidor
+        errorMessage += 'No se recibió respuesta desde el servidor.';
+      } else {
+        errorMessage += `Error: ${error.message}`;
+      }
+  
+      alert(errorMessage);
+    }
+  };
+
   if (error) {
     return <ErrorText>{error}</ErrorText>;
   }
@@ -100,21 +139,13 @@ const ContentView = ({ themeId, token, username }) => {
 
   return (
     <Container>
-      <TotalsContainer>
-        <h3>Total de contenidos:</h3>
-        <TotalsList>
-          <li>imágenes: <strong>{totalImages}</strong></li>
-          <li>videos: <strong>{totalVideos}</strong></li>
-          <li>textos: <strong>{totalTexts}</strong></li>
-        </TotalsList>
-      </TotalsContainer>
       <Header>
         <h2>Contenidos relacionados con "{username}":</h2>
       </Header>
       
       <ContentsContainer>
         <h3 style={{ width: '100%', marginBottom: '20px' }}>Listado de contenidos</h3>
-        <ContentsList style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }}>
+        <ContentsList style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '25px' }}>
           {contents.map((content, index) => (
             <ContentItem key={index} style={{ flex: '1 1 calc(25% - 20px)' }}>
               {content.type === 'imagen' ? (
@@ -132,8 +163,15 @@ const ContentView = ({ themeId, token, username }) => {
                 )
               ) : content.type === 'video' ? (
                 <ContentVideo src={`https://www.youtube.com/embed/${new URL(content.videoUrl).searchParams.get('v')}`} title={content.title} />
-              ) : (
-                <ContentText>{content.text || "No hay texto disponible"}</ContentText>
+              ) :  (
+                <ContentText>
+                  {""}
+                  {content.file && (
+                    <button onClick={() => downloadFile(content._id)} style={{ marginTop: '100px' }}>
+                      Descargar archivo
+                    </button>
+                  )}
+                </ContentText>
               )}
               <ContentInfo>
                 <h4>{content.title}</h4>
@@ -148,35 +186,19 @@ const ContentView = ({ themeId, token, username }) => {
   );
 };
 
+
+
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0px;
 `;
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 `;
 
-const TotalsContainer = styled.div`
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 50px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-const TotalsList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-  width: 85%;
-`;
 
 const ContentsContainer = styled.div`
   background-color: #ffffff;
@@ -201,23 +223,26 @@ const ContentItem = styled.li`
 
 const ContentImage = styled.img`
   width: 100%;
-  height: 300px;
+  height: 240px;
   object-fit: cover;
   border-radius: 5px;
   display: block;
 `;
 
 const ContentText = styled.p`
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  font-size: 14px;
+   width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+  display: block;
 `;
 
 const ContentVideo = styled.iframe`
   width: 100%;
-  height: 150px;
-  border: none;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 5px;
+  display: block;
 `;
 
 const ContentInfo = styled.div`
