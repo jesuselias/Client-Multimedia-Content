@@ -6,14 +6,22 @@ import axios from 'axios';
 
 const DashboardContainer = styled.div`
   max-width: 100%;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
+
 `;
 
 const Header = styled.header`
   text-align: center;
-  margin-bottom: 0px;
+  color: white;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+`;
+
+const GreenText = styled.span`
+  color: white;
+  text-shadow: -1px 0 green, 0 1px green, 1px 0 green, 0 -1px green;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  margin-top: 5px;
 `;
 
 const Select = styled.select`
@@ -21,8 +29,12 @@ const Select = styled.select`
   margin: 0 auto 2px;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #666;
+  border-radius: 25px; /* Hace las esquinas más redondeadas */
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  background-size: 10px;
 `;
 
 const TopRow = styled.div`
@@ -37,18 +49,17 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 10px;
-  
 `;
 
 const TotalsContainer = styled.div`
-  background-color: #f0f0f0;
+    background-image: linear-gradient(to bottom right, #333, #555);
   padding: 20px;
   border-radius: 8px;
-  margin-bottom: 50px;
+  margin-bottom: 5px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+   color: white; /* Añade esta línea para cambiar el color del texto a blanco */
 `;
 
 const TotalsList = styled.ul`
@@ -63,28 +74,36 @@ const TotalsList = styled.ul`
 const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 00px;
 `;
 
 const SearchButton = styled.button`
-  width: 30%;
+  width: 120px;
   height: 42px;
   font-size: 18px;
-  background-color: #007bff;
+  background-color: #333;
   color: white;
   border: none;
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 25px 25px 0; /* Hace las esquinas derechas redondeadas */
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const SearchInput = styled.input`
-  width: 100%;
+  width: calc(100% - 120px); /* Ajusta el ancho para dejar espacio para el botón */
   height: 20px;
   font-size: 18px;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px 0 0 5px;
+  border: 1px solid #666;
+  border-radius: 25px 0 0 25px; /* Hace las esquinas izquierdas redondeadas */
+  background-color: #333;
+  color: white;
 `;
+
+
 
 const DashboardHome = ({ isLoggedIn, role, token, username }) => {
   const [themes, setThemes] = useState([]);
@@ -147,15 +166,12 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
       <Header>
         <div style={{
           textAlign: 'center',
-          marginBottom: '30px',
-          display: 'inline-flex',
-          justifyContent: 'center',
-          alignItems: 'center'
+
         }}>
           {isLoggedIn ? (
             <>
-              <h2 style={{ marginRight: '10px' }}>Bienvenido:</h2>
-              <h2 style={{ color: '#4CAF50', fontWeight: 'bold' }}>{role}</h2>
+             <h2>Bienvenido {username}</h2>
+            <GreenText>Role: {role}</GreenText>
             </>
           ) : (
             <span style={{ color: '#f44336', fontWeight: 'bold' }}>No estás autorizado para acceder a este dashboard.</span>

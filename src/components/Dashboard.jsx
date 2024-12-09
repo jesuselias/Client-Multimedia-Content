@@ -16,8 +16,8 @@ const Sidebar = styled.aside`
   left: 0;
   top: 0;
   bottom: 0;
-  width: 250px;
-  background-color: #212121;
+  width: 220px;
+  background-color: #000000;
   color: white;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
@@ -35,7 +35,7 @@ const SidebarMenuItem = styled.li`
   
   &:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    padding-left: 10px;
+    padding-left: 7px;
   }
 `;
 
@@ -50,13 +50,16 @@ const SidebarItemLink = styled(Link)`
 const DashboardContainer = styled.div`
   display: flex;
   height: 100vh;
+  //background-image: linear-gradient(to bottom right, #e3e2e2, #cacaca);
+  background-color: #000000;
 `;
 
 const ContentArea = styled.div`
   flex-grow: 1;
-  padding: 20px;
+  padding: 1px;
   overflow-y: auto;
-  margin-left: 350px; /* Añade este margen para desplazar el contenido */
+  margin-left: 270px; /* Añade este margen para desplazar el contenido */
+  
 `;
 
 const Container = styled.div`
@@ -64,6 +67,16 @@ const Container = styled.div`
   margin-bottom: 20px;
   width:100%
 `;
+
+// const VerticalSeparator = styled.hr`
+//   height: 100%;
+
+//   background-color: white;
+//   opacity: 1;
+//   margin-top: 0px;
+//   position: absolute;
+//   left: 240px; // Ajusta este valor según el ancho del Sidebar
+// `;
 
 const LogoutButton = styled.button`
   background-color: #6c757d;
@@ -93,13 +106,13 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
     Admin: [
       { label: 'Crear Categoría', path: '/dashboard/create-category' },
       { label: 'Crear Tematica', path: '/dashboard/create-themes' },
-      { label: 'Create Content', path: '/dashboard/create-contents' },
+      { label: 'Crear Contenido', path: '/dashboard/create-contents' },
       { label: 'Contenido Segun Temática', path: '/dashboard' },
       { label: 'Buscar Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
     ],
     Creador: [
-      { label: 'Create Content', path: '/dashboard/create-contents' },
+      { label: 'Crear Contenido', path: '/dashboard/create-contents' },
       { label: 'Contenido Segun Temática', path: '/dashboard' },
       { label: 'Buscar Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
@@ -138,6 +151,7 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
         </SidebarMenu>
         <LogoutButton onClick={handleLogout}>Cerrar sesión</LogoutButton>
       </Sidebar>
+      {/* <VerticalSeparator /> */}
       <ContentArea>
         <Container>
           {isLoggedIn && role === 'Admin' ? (

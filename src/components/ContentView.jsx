@@ -100,6 +100,8 @@ const ContentView = ({ themeId, token, username }) => {
         fileName += '.mp3';
       } else if (response.headers['content-type'].includes('pdf')) {
         fileName += '.pdf';
+      } else if (response.headers['content-type'].includes('docx')) {
+        fileName += '.docx';
       }
       
       link.download = fileName;
@@ -139,17 +141,14 @@ const ContentView = ({ themeId, token, username }) => {
 
   return (
     <Container>
-      <Header>
-        <h2>Contenidos relacionados con "{username}":</h2>
-      </Header>
-      
       <ContentsContainer>
-        <h3 style={{ width: '100%', marginBottom: '20px' }}>Listado de contenidos</h3>
-        <ContentsList style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '25px' }}>
+        <h3 style={{ color:"white", width: '100%', marginBottom: '7px' }}>Listado de contenidos</h3>
+        <ContentsList style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
           {contents.map((content, index) => (
-            <ContentItem key={index} style={{ flex: '1 1 calc(25% - 20px)' }}>
+            <ContentItem key={index} style={{ flex: '0 0 25%' }}>
               {content.type === 'imagen' ? (
                 images[content._id] ? (
+                  <ContainerT>
                   <ContentImage 
                     src={images[content._id]} 
                     alt={content.title} 
@@ -158,20 +157,27 @@ const ContentView = ({ themeId, token, username }) => {
                       console.log('Error al cargar la imagen:', content._id);
                     }}
                   />
+                  </ContainerT>
                 ) : (
                   <div style={{ textAlign: 'center', marginTop: '10px' }}>No se pudo cargar la imagen</div>
                 )
+                
               ) : content.type === 'video' ? (
+                <ContainerT>
                 <ContentVideo src={`https://www.youtube.com/embed/${new URL(content.videoUrl).searchParams.get('v')}`} title={content.title} />
+                </ContainerT>
               ) :  (
-                <ContentText>
-                  {""}
+                <ContainerT>
+                <ContentArchivo>
+                  
                   {content.file && (
                     <button onClick={() => downloadFile(content._id)} style={{ marginTop: '100px' }}>
                       Descargar archivo
                     </button>
                   )}
-                </ContentText>
+                 
+                </ContentArchivo>
+                </ContainerT>
               )}
               <ContentInfo>
                 <h4>{content.title}</h4>
@@ -189,50 +195,60 @@ const ContentView = ({ themeId, token, username }) => {
 
 
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0px;
-`;
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 0px;
+ 
 `;
 
 
 const ContentsContainer = styled.div`
-  background-color: #ffffff;
-  padding: 20px;
   border-radius: 8px;
+  width: 100%;
+  //background-image: linear-gradient(to bottom right, #e3e2e2, #cacaca);
+  background-color: #000000;
+
 `;
 
 const ContentsList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 `;
 
+
 const ContentItem = styled.li`
-  margin-bottom: 20px;
   background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 200px;
+  min-height: 320px; /* Ajustado para incluir el contenido de información */
+    flex: 0 0 33.333%; /* Ajusta el ancho a 1/3 del contenedor */
+  min-width: 420px; /* Ancho mínimo para asegurar suficiente espacio */
+  display: flex;
+  flex-direction: column;
 `;
+
 
 const ContentImage = styled.img`
   width: 100%;
-  height: 240px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
   border-radius: 5px;
   display: block;
 `;
 
-const ContentText = styled.p`
-   width: 100%;
-  height: 200px;
-  object-fit: cover;
+const ContainerT = styled.div`
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-image: linear-gradient(to bottom right, #333, #555);
+`;
+
+const ContentArchivo = styled.p`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   border-radius: 5px;
   display: block;
 `;
@@ -240,13 +256,16 @@ const ContentText = styled.p`
 const ContentVideo = styled.iframe`
   width: 100%;
   height: 240px;
-  object-fit: cover;
+   object-fit: cover;
   border-radius: 5px;
   display: block;
 `;
 
 const ContentInfo = styled.div`
-  padding: 15px;
+  padding: 7px;
+  background-image: linear-gradient(to bottom right, #333, #555);
+  color: white;
+  flex-grow: 1; /* Esto hará que el contenido de información ocupe el espacio restante */
 `;
 
 const ErrorText = styled.p`

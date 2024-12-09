@@ -354,12 +354,15 @@ function CreateContents({ token, userRole }) {
             required
           />
         ) : contentType === 'archivo' ? (
+          <div>
           <InputField
           type="file"
           name="file"
           onChange={uploadFile}
           required
         />
+          <h6>Para descargar archivos (txt, docx, pdf, mp4, mp3..)</h6>
+        </div>
         ) : null}
         {errors.url && <ErrorText>{errors.url}</ErrorText>}
         <Select
