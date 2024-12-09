@@ -41,7 +41,7 @@ const TopRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 80%;
+  width: 75%;
 `;
 
 const ContentWrapper = styled.div`

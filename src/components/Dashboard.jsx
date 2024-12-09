@@ -9,14 +9,16 @@ import CreateThemes from './CreateThemes';
 import CreateContents from './CreateContents';
 import ThemeSearcher from './ThemeSearcher';
 import ContentSearcher from './ContentSearch';
+import CircularMenu from './CircularMenu';
+import PhindChatComponent from './PhindChatComponent'; 
 
 
 const Sidebar = styled.aside`
   position: fixed;
   left: 0;
   top: 0;
-  bottom: 0;
-  width: 220px;
+  bottom: 60px;
+  width: 250px;
   background-color: #000000;
   color: white;
   padding: 20px;
@@ -68,6 +70,35 @@ const Container = styled.div`
   width:100%
 `;
 
+const ProfileContainer = styled.div`
+  position: absolute; // Usamos position: absolute
+  top: 5px;
+  right: 7px;
+  display: flex;
+  align-items: center;
+  z-index: 1000; // Aseguramos que esté encima de otros elementos
+`;
+
+const UserProfile = styled.div`
+  display: flex;
+  align-items: center;
+
+`;
+
+const ProfileImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+`;
+
+const UserName = styled.span`
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+
 // const VerticalSeparator = styled.hr`
 //   height: 100%;
 
@@ -78,26 +109,26 @@ const Container = styled.div`
 //   left: 240px; // Ajusta este valor según el ancho del Sidebar
 // `;
 
-const LogoutButton = styled.button`
-  background-color: #6c757d;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 70%;
-  margin-top: 600px;
+// const LogoutButton = styled.button`
+//   background-color: #6c757d;
+//   color: white;
+//   padding: 10px 20px;
+//   border: none;
+//   border-radius: 4px;
+//   cursor: pointer;
+//   transition: background-color 0.3s ease;
+//   width: 70%;
+//   margin-top: 600px;
 
-  &:hover {
-    background-color: #5a6268;
-  }
+//   &:hover {
+//     background-color: #5a6268;
+//   }
 
-  @media (max-width: 768px) {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-`;
+//   @media (max-width: 768px) {
+//     padding: 8px 16px;
+//     font-size: 14px;
+//   }
+// `;
 
 
 
@@ -129,9 +160,7 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
     window.location.href = '/login';
   };
 
-
   const currentRole = role;
-
   const location = useLocation();
 
   return (
@@ -148,12 +177,21 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
           ) : (
             <p>No tienes permisos para ver este menú</p>
           )}
+         
         </SidebarMenu>
-        <LogoutButton onClick={handleLogout}>Cerrar sesión</LogoutButton>
+          <PhindChatComponent />
+        {/* <LogoutButton onClick={handleLogout}>Mas</LogoutButton> */}
       </Sidebar>
       {/* <VerticalSeparator /> */}
       <ContentArea>
         <Container>
+        <ProfileContainer>
+          <UserProfile>
+            <ProfileImage src="https://via.placeholder.com/40" alt="Profile" />
+            <UserName>{username}</UserName>
+          </UserProfile>
+          <CircularMenu handleLogout={handleLogout} />
+        </ProfileContainer>
           {isLoggedIn && role === 'Admin' ? (
             <>
                 {location.pathname === '/dashboard' && (
