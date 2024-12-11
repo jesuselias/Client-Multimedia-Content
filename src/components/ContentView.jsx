@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import downloadIcon from '../assets/img/descarga.png';
+import docxIcon from '../assets/img/docx.png';
+import pdfIcon from '../assets/img/pdf.png';
+import txtIcon from '../assets/img/txt.png';
+import videoIcon from '../assets/img/video-descarga.png';
+import musicaIcon from '../assets/img/musica.png';
 
 const ContentView = ({ themeId, token, username }) => {
   const [contents, setContents] = useState([]);
@@ -168,15 +174,28 @@ const ContentView = ({ themeId, token, username }) => {
                 </ContainerT>
               ) :  (
                 <ContainerT>
-                <ContentArchivo>
-                  
-                  {content.file && (
-                    <button onClick={() => downloadFile(content._id)} style={{ marginTop: '100px' }}>
-                      Descargar archivo
-                    </button>
-                  )}
-                 
-                </ContentArchivo>
+               <ContentArchivo>
+                    {content.file && (
+                      <img 
+                      src={
+                        content.file.toLowerCase().endsWith('.docx') ? docxIcon :
+                        content.file.toLowerCase().endsWith('.pdf') ? pdfIcon :
+                        content.file.toLowerCase().endsWith('.txt') ? txtIcon :
+                        content.file.toLowerCase().endsWith('.mp3') ? musicaIcon :
+                        content.file.toLowerCase().endsWith('.mp4') ? videoIcon :
+                        downloadIcon
+                      } 
+                        alt="Descargar archivo" 
+                        onClick={() => downloadFile(content._id)} 
+                        style={{ 
+                          marginTop: '100px', 
+                          cursor: 'pointer',
+                          width: '50px', // Ajusta el tamaño según sea necesario
+                          height: 'auto'
+                        }} 
+                      />
+                    )}
+                  </ContentArchivo>
                 </ContainerT>
               )}
               <ContentInfo>

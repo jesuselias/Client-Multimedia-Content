@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios'; // Agrega esta línea
-import logo from '../assets/img/logo-multimedia.png'
+import logo from '../assets/img/simbolo-descargador-archivo.png'
 import { useNavigate } from 'react-router-dom';
 
 const LoginContainer = styled.div`
@@ -12,6 +12,7 @@ const LoginContainer = styled.div`
   height: 80vh;
   max-width: 20%;
   margin: 0 auto;
+  background-color: black;
 `;
 
 const LoginForm = styled.form`
@@ -79,7 +80,16 @@ function Login({ onSuccess }) {
 
   return (
     <LoginContainer>
-      <img src={logo} alt="Logo" style={{width: '100%', maxWidth: '117px'}} />
+      <img 
+        src={logo} 
+        alt="Logo" 
+        style={{
+          width: '100%',
+          maxWidth: '157px',
+          borderRadius: '50%',
+          border: '3px solid white'
+        }} 
+      />
       <h1>Iniciar Sesión</h1>
       <LoginForm onSubmit={handleSubmit}>
         <Label>Usuario:</Label>
@@ -99,7 +109,12 @@ function Login({ onSuccess }) {
           required
         />
         {error && <ErrorText>{error}</ErrorText>}
-        <Button type="submit">Iniciar Sesión</Button>
+        <Button 
+          style={{ marginTop: '5px', backgroundColor: 'rgb(40 45 50)' }} 
+          type="submit"
+        >
+          Iniciar Sesión
+        </Button>
         <Button 
           type="button"
           style={{ marginTop: '5px', backgroundColor: '#6c757d' }}

@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ContentView from './ContentView'; // Import the existing ContentView component
 import axios from 'axios';
+import iconArchivo from  './../assets/img/simbolo-descargador-archivo.png';
+import iconImagen from  './../assets/img/simbolo-de-imagen-n.png';
+import iconVideo from  './../assets/img/simbolo-de-video.png';
+import searchIcon from './../assets/img/lupa.png'; 
 
 const DashboardContainer = styled.div`
   max-width: 100%;
@@ -25,7 +29,7 @@ const GreenText = styled.span`
 `;
 
 const Select = styled.select`
-  width: 200px;
+  width: 240px;
   margin: 0 auto 2px;
   padding: 10px;
   font-size: 16px;
@@ -60,6 +64,10 @@ const TotalsContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
    color: white; /* Añade esta línea para cambiar el color del texto a blanco */
+    h3 {
+    color: #ffffff; // Cambia el color a blanco
+    margin-bottom: 30px; // Añade un poco de espacio inferior
+  }
 `;
 
 const TotalsList = styled.ul`
@@ -71,14 +79,19 @@ const TotalsList = styled.ul`
   width: 85%;
 `;
 
+const Icon = styled.img`
+  width: 40px;
+  height: auto;
+`;
+
 const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
 `;
 
 const SearchButton = styled.button`
-  width: 120px;
-  height: 42px;
+  width: 100px;
+  height: 43px;
   font-size: 18px;
   background-color: #333;
   color: white;
@@ -88,7 +101,7 @@ const SearchButton = styled.button`
   transition: background-color 0.3s ease;
   
   &:hover {
-    background-color: #0056b3;
+    background-color: #666;
   }
 `;
 
@@ -103,6 +116,11 @@ const SearchInput = styled.input`
   color: white;
 `;
 
+const SearchIcon = styled.img`
+  width: 20px;
+  height: auto;
+  margin-right: 10px;
+`;
 
 
 const DashboardHome = ({ isLoggedIn, role, token, username }) => {
@@ -187,7 +205,9 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar contenido..."
             />
-            <SearchButton onClick={handleSearch}>Buscar</SearchButton>
+            <SearchButton onClick={handleSearch}>
+              <SearchIcon src={searchIcon} alt="Buscar" />
+            </SearchButton>
           </SearchBarContainer>
 
           <Select
@@ -203,9 +223,24 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
           <TotalsContainer>
             <h3>Total de contenidos:</h3>
             <TotalsList>
-              <li>imágenes: <strong>{totalImages}</strong></li>
-              <li>videos: <strong>{totalVideos}</strong></li>
-              <li>archivos: <strong>{totalTexts}</strong></li>
+              <li>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Icon src={iconImagen} alt="Icono de archivo" style={{ marginBottom: '5px' }} />
+                  <span>imágenes: <strong>{totalImages}</strong></span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Icon src={iconVideo} alt="Icono de archivo" style={{ marginBottom: '5px' }} />
+                  <span>videos: <strong>{totalVideos}</strong></span>
+                </div>
+              </li>
+              <li>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Icon src={iconArchivo} alt="Icono de archivo" style={{ marginBottom: '5px' }} />
+                  <span>archivos: <strong>{totalTexts}</strong></span>
+                </div>
+              </li>
             </TotalsList>
           </TotalsContainer>
           </TopRow>

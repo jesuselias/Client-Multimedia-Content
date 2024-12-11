@@ -10,7 +10,12 @@ import CreateContents from './CreateContents';
 import ThemeSearcher from './ThemeSearcher';
 import ContentSearcher from './ContentSearch';
 import CircularMenu from './CircularMenu';
-import PhindChatComponent from './PhindChatComponent'; 
+import PhindChatComponent from './PhindChatComponent';
+import createIcon from '../assets/img/crear.png'; // Asegúrate de que esta ruta sea correcta
+import searchIcon from '../assets/img/lupa.png';
+import folderCIcon from '../assets/img/crear-carpeta.png';
+import folderBIcon from '../assets/img/buscar-carpeta.png';
+import CategoriaIcon from '../assets/img/categoria.png';   
 
 
 const Sidebar = styled.aside`
@@ -32,7 +37,7 @@ const SidebarMenu = styled.ul`
 `;
 
 const SidebarMenuItem = styled.li`
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   transition: all 0.3s ease;
   
   &:hover {
@@ -135,22 +140,22 @@ const UserName = styled.span`
 const Dashboard = ({ isLoggedIn, role, token, username }) => {
   const menuItems = {
     Admin: [
+      { label: 'Contenido', path: '/dashboard' },
+      { label: 'Temática', path: '/dashboard/search-theme' },
+      // { label: 'Buscar Contenido', path: '/dashboard/search-content' },
       { label: 'Crear Categoría', path: '/dashboard/create-category' },
       { label: 'Crear Tematica', path: '/dashboard/create-themes' },
       { label: 'Crear Contenido', path: '/dashboard/create-contents' },
-      { label: 'Contenido Segun Temática', path: '/dashboard' },
-      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
-      { label: 'Buscar Contenido', path: '/dashboard/search-content' },
     ],
     Creador: [
-      { label: 'Crear Contenido', path: '/dashboard/create-contents' },
-      { label: 'Contenido Segun Temática', path: '/dashboard' },
-      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
+      { label: 'Contenido', path: '/dashboard' },
+      { label: 'Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
+      { label: 'Crear Contenido', path: '/dashboard/create-contents' },
     ],
     Lector: [
-      { label: 'Contenido Segun Temática', path: '/dashboard' },
-      { label: 'Buscar Temática', path: '/dashboard/search-theme' },
+      { label: 'Contenido', path: '/dashboard' },
+      { label: 'Temática', path: '/dashboard/search-theme' },
       { label: 'Buscar Contenido', path: '/dashboard/search-content' },
     ],
   };
@@ -171,7 +176,20 @@ const Dashboard = ({ isLoggedIn, role, token, username }) => {
           {currentRole && menuItems[currentRole] ? (
             menuItems[currentRole].map((item, index) => (
               <SidebarMenuItem key={index}>
-                <SidebarItemLink to={item.path}>{item.label}</SidebarItemLink>
+                <SidebarItemLink to={item.path}>
+                  {item.label.includes('Crear Contenido') ? (
+                    <img src={createIcon} alt="Crear" style={{ width: '20px', marginRight: '10px' }} />
+                  ) : item.label.includes('Crear Tematica') ? (
+                    <img src={folderCIcon} alt="Carpeta" style={{ width: '20px', marginRight: '10px' }} />
+                  ) : item.label.includes('Temática') ? (
+                    <img src={folderBIcon} alt="Carpeta" style={{ width: '20px', marginRight: '10px' }} />
+                  ) : item.label.includes('Crear Categoría') ? (
+                    <img src={CategoriaIcon} alt="Carpeta" style={{ width: '20px', marginRight: '10px' }} />
+                  ) : (
+                    <img src={searchIcon} alt="Buscar" style={{ width: '20px', marginRight: '10px' }} />
+                  )}
+                  {item.label}
+                  </SidebarItemLink>
               </SidebarMenuItem>
             ))
           ) : (
