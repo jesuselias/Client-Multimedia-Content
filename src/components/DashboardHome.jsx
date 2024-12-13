@@ -1,5 +1,5 @@
 // src/components/DashboardHome.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import ContentView from './ContentView'; // Import the existing ContentView component
 import axios from 'axios';
@@ -131,25 +131,35 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
   const [totalTexts, setTotalTexts] = useState(0);
  // const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
- // const [contents, setContents] = useState([]);
+  const [filterContents, setFilterContents] = useState([]);
 
   const handleThemeChange = (event) => {
     setSelectedTheme(event.target.value);
   };
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     try {
-     await axios.get(`${process.env.REACT_APP_API_URL}/api/user/search-contents`, {
+      console.log("Buscando por:", searchTerm);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/search-contents`, {
         params: { term: searchTerm },
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      //setContents(response.data);
+      console.log("Resultado de la búsqueda:", response.data);
+      
+      // Filtrar los resultados para mostrar solo los que coincidan con la búsqueda
+      const filteredResults = response.data.filter(content => 
+        Object.values(content).some(value => 
+          typeof value === 'string' && value !== undefined && value.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+  
+      setFilterContents(filteredResults);
     } catch (error) {
-      console.error('Error searching contents:', error);
+      console.error('Error buscando contenidos:', error);
     }
-  };
+  }, [searchTerm, token]);
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -246,7 +256,7 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
           </TopRow>
 
 
-        <ContentView themeId={selectedTheme} token={token} username={username} />
+        <ContentView themeId={selectedTheme} token={token} username={username} searchTerm={searchTerm} filterContents={filterContents} />
       </ContentWrapper>
     </DashboardContainer>
   );

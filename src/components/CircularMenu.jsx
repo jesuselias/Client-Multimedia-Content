@@ -38,7 +38,7 @@ const MenuList = styled.div`
   padding: 10px;
   border-radius: 10px;
   z-index: 1000;
-  display: ${(props) => props.isOpen ? 'block' : 'none'};
+  display: ${props => props.$isOpen ? 'block' : 'none'};
 `;
 
 const MenuItems = styled.ul`
@@ -70,16 +70,18 @@ const CircularMenu = ({ handleLogout }) => {
   return (
     <MenuWrapper>
       <MenuIcon onClick={toggleMenu}>⋮</MenuIcon>
-      <MenuList isOpen={isOpen}>
-        <MenuItems>
-          <li><MenuLink href="#profile">Perfil</MenuLink></li>
-          <li><MenuLink href="#settings">Ajustes</MenuLink></li>
-          <li><MenuLink onClick={() => {
-            handleLogout();
-            setIsOpen(false);
-          }}>Cerrar Sesión</MenuLink></li>
-        </MenuItems>
-      </MenuList>
+      {isOpen && (
+        <MenuList $isOpen={isOpen}>
+          <MenuItems>
+            <li><MenuLink href="#profile">Perfil</MenuLink></li>
+            <li><MenuLink href="#settings">Ajustes</MenuLink></li>
+            <li><MenuLink onClick={() => {
+              handleLogout();
+              setIsOpen(false);
+            }}>Cerrar Sesión</MenuLink></li>
+          </MenuItems>
+        </MenuList>
+      )}
     </MenuWrapper>
   );
 };

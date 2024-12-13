@@ -7,36 +7,72 @@ import pdfIcon from '../assets/img/pdf.png';
 import txtIcon from '../assets/img/txt.png';
 import videoIcon from '../assets/img/video-descarga.png';
 import musicaIcon from '../assets/img/musica.png';
+import likeIcon from '../assets/img/video-descarga.png';
+import shareIcon from '../assets/img/musica.png';
 
-const ContentView = ({ themeId, token, username }) => {
+const ContentView = ({ themeId, token, filterContents }) => {
   const [contents, setContents] = useState([]);
   const [error, setError] = useState(null);
   const [images, setImages] = useState({});
+  const [filteredContents, setFilteredContents] = useState([]); // New state for filtered contents
 
   useEffect(() => {
-    const fetchContents = async () => {
-      if (!themeId) return;
+    if (filterContents.length > 0) {
+      setContents(filterContents);
+      setFilteredContents(filterContents);
+    } else {
 
+    const fetchContents = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/content/${themeId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (Array.isArray(response.data)) {
-          setContents(response.data);
-        } else {
-          throw new Error("La respuesta no es un array");
-        }
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/contentsTotal`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        setContents(response.data);
+        setFilteredContents(response.data); // Initially, all contents are filtered
       } catch (error) {
         console.error('Error fetching contents:', error);
-        setError('Error al obtener los contenidos');
+        setError('Error al obtener todos los contenidos');
       }
     };
 
-
-
     fetchContents();
-  }, [themeId, token]);
+  }
+  }, [filterContents, token]);
+
+  useEffect(() => {
+    const filterContents = () => {
+      if (!themeId || themeId === 'all') {
+        setFilteredContents(contents);
+      } else {
+        const filtered = contents.filter(content => content.themeId === themeId);
+        setFilteredContents(filtered);
+      }
+    };
+
+    filterContents();
+  }, [themeId, contents]);
+
+
+  // useEffect(() => {
+  //   const fetchContents = async () => {
+  //     if (!themeId) return;
+
+  //     try {
+  //       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/content/${themeId}`, {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       });
+        
+  //       if (Array.isArray(response.data)) {
+  //         setContents(response.data);
+  //       } else {
+  //         throw new Error("La respuesta no es un array");
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching contents:', error);
+  //       setError('Error al obtener los contenidos');
+  //     }
+  //   };
+
 
   useEffect(() => {
     const loadImages = async () => {
@@ -136,22 +172,20 @@ const ContentView = ({ themeId, token, username }) => {
       alert(errorMessage);
     }
   };
+  
 
   if (error) {
     return <ErrorText>{error}</ErrorText>;
   }
 
-  if (!themeId) {
-    return <p>No hay contenidos para mostrar. Por favor, seleccione un tema.</p>;
-  }
 
   return (
     <Container>
       <ContentsContainer>
         <h3 style={{ color:"white", width: '100%', marginBottom: '7px' }}>Listado de contenidos</h3>
         <ContentsList style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
-          {contents.map((content, index) => (
-            <ContentItem key={index} style={{ flex: '0 0 25%' }}>
+        {filteredContents.map((content) => (
+            <ContentItem key={content._id} style={{ flex: '0 0 25%' }}>
               {content.type === 'imagen' ? (
                 images[content._id] ? (
                   <ContainerT>
@@ -198,11 +232,27 @@ const ContentView = ({ themeId, token, username }) => {
                   </ContentArchivo>
                 </ContainerT>
               )}
-              <ContentInfo>
-                <h4>{content.title}</h4>
-                <p>{content.description || "No hay descripción disponible"}</p>
+             <ContentInfo>
+                  <h4>{content.title}</h4>
+              <InfoTop>
+              <LikeButton>
+                  <img src={likeIcon} alt="Me gusta" style={{ width: '25px', marginRight: '5px' }} />
+                  100 Me gusta
+                </LikeButton>
+                <DownloadButton onClick={() => downloadFile(content._id)}>
+                  <img src={downloadIcon} alt="Descargar" style={{ width: '25px', marginRight: '5px' }} />
+                  Descargar
+                </DownloadButton>
+                <ShareButton>
+                  <img src={shareIcon} alt="Compartir" style={{ width: '25px', marginRight: '5px' }} />
+                  Compartir
+                </ShareButton>
+              </InfoTop>
+              <p>{content.description || "No hay descripción disponible"}</p>
+              <InfoBottom>
                 <small>Creador: {content.credits || "Creador desconocido"}</small>
-              </ContentInfo>
+              </InfoBottom>
+            </ContentInfo>
             </ContentItem>
           ))}
         </ContentsList>
@@ -284,8 +334,55 @@ const ContentInfo = styled.div`
   padding: 7px;
   background-image: linear-gradient(to bottom right, #333, #555);
   color: white;
-  flex-grow: 1; /* Esto hará que el contenido de información ocupe el espacio restante */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
+
+const InfoTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const InfoBottom = styled.div`
+ // display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+`;
+
+const LikeButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 16px;
+`;
+
+const ShareButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 17px;
+`;
+
+const DownloadButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 17px;
+`;
+
 
 const ErrorText = styled.p`
   color: red;

@@ -234,6 +234,9 @@ function CreateContents({ token, userRole }) {
   
         if (contentType === 'imagen') {
           formData.append('image', image);
+
+          fileObject = file?.originalFile;
+          formData.append('file', fileObject);
         } else if (contentType === 'archivo') {
         //  fileContent = file?.content;
           fileObject = file?.originalFile;
@@ -270,6 +273,30 @@ function CreateContents({ token, userRole }) {
       console.log("aqui",reader.result)
       setImage(reader.result)
     }
+
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        console.log("File contents:", reader.result);
+        setFile({ originalFile: file, content: reader.result });
+      };
+  
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+        setMessage('Error al leer el archivo seleccionado');
+      };
+  
+      reader.onabort = () => {
+        console.warn('File read aborted');
+        setMessage('Leer del archivo abortado');
+      };
+
+      reader.readAsDataURL(file);
+      
+    }
+
   }
 
 
