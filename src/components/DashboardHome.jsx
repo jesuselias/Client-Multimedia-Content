@@ -132,10 +132,23 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
  // const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterContents, setFilterContents] = useState([]);
+  const [searchRecommends, setSearchRecommends] = useState({});
 
   const handleThemeChange = (event) => {
     setSelectedTheme(event.target.value);
   };
+
+  const getInitialRecommendCount = useCallback(async (contentId) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/get-initial-recommend-counts/${contentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching initial recommend count:', error);
+      return null;
+    }
+  }, [token]);
 
   const handleSearch = useCallback(async () => {
     try {
@@ -156,10 +169,24 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
       );
   
       setFilterContents(filteredResults);
+  
+      // Actualizar las recomendaciones para los contenidos filtrados
+      const updateRecommends = async () => {
+        const recommendsObject = {};
+        for (const content of filteredResults) {
+          const recommendData = await getInitialRecommendCount(content._id);
+          if (recommendData) {
+            recommendsObject[content._id] = recommendData.recommends;
+          }
+        }
+        setSearchRecommends(recommendsObject);
+      };
+  
+      await updateRecommends();
     } catch (error) {
       console.error('Error buscando contenidos:', error);
     }
-  }, [searchTerm, token]);
+  }, [searchTerm, token, getInitialRecommendCount]);
 
   useEffect(() => {
     const fetchThemes = async () => {
@@ -256,7 +283,14 @@ const DashboardHome = ({ isLoggedIn, role, token, username }) => {
           </TopRow>
 
 
-        <ContentView themeId={selectedTheme} token={token} username={username} searchTerm={searchTerm} filterContents={filterContents} />
+          <ContentView 
+            themeId={selectedTheme} 
+            token={token} 
+            username={username} 
+            searchTerm={searchTerm} 
+            filterContents={filterContents}
+            searchRecommends={searchRecommends}
+          />
       </ContentWrapper>
     </DashboardContainer>
   );

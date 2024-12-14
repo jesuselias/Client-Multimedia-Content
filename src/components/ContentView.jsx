@@ -10,7 +10,7 @@ import musicaIcon from '../assets/img/musica.png';
 import likeIcon from '../assets/img/video-descarga.png';
 import shareIcon from '../assets/img/musica.png';
 
-const ContentView = ({ themeId, token, filterContents }) => {
+const ContentView = ({ themeId, token, filterContents, searchRecommends }) => {
   const [contents, setContents] = useState([]);
   const [error, setError] = useState(null);
   const [images, setImages] = useState({});
@@ -81,6 +81,14 @@ const ContentView = ({ themeId, token, filterContents }) => {
   // }, [recommends]);
 
   useEffect(() => {
+    if (searchRecommends) {
+      setRecommends(searchRecommends);
+      
+    }
+  }, [searchRecommends]);
+
+  useEffect(() => {
+    console.log("filterContents.length",filterContents.length)
     if (filterContents.length > 0) {
       setContents(filterContents);
       setFilteredContents(filterContents);
@@ -111,6 +119,7 @@ const ContentView = ({ themeId, token, filterContents }) => {
           }
         }
         setRecommends(initialRecommendCounts);
+        
       } catch (error) {
         console.error('Error fetching contents:', error);
         console.error('Response status:', error.response?.status);
@@ -118,7 +127,6 @@ const ContentView = ({ themeId, token, filterContents }) => {
         setError(`Error al obtener todos los contenidos: ${JSON.stringify(error.message)}`);
       }
     };
-
     fetchContents();
   }
   // eslint-disable-next-line
@@ -130,7 +138,10 @@ const ContentView = ({ themeId, token, filterContents }) => {
         setFilteredContents(contents);
       } else {
         const filtered = contents.filter(content => content.themeId === themeId);
-        setFilteredContents(filtered);
+        const sortedContents = filtered.sort((a, b) => {
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        });
+        setFilteredContents(sortedContents);
       }
     };
 
