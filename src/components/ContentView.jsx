@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import downloadIcon from '../assets/img/descarga.png';
@@ -15,6 +15,70 @@ const ContentView = ({ themeId, token, filterContents }) => {
   const [error, setError] = useState(null);
   const [images, setImages] = useState({});
   const [filteredContents, setFilteredContents] = useState([]); // New state for filtered contents
+  const [recommends, setRecommends] = useState({});
+
+  useEffect(() => {
+    if (contents.length > 0) {
+      contents.forEach((content) => {
+        setRecommends(prev => ({
+          ...prev,
+          [content._id]: 0
+        }));
+      });
+    }
+  }, [contents]);
+
+  const updateLikesAndRecommends = async (contentId, action) => {
+    console.log("contentId", contentId);
+    console.log("action", action);
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/update-like-recommend`, {
+        contentId,
+        action,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Actualiza el estado local basándose en la respuesta del servidor
+      setRecommends(prev => ({
+        ...prev,
+        [contentId]: response.data.recommends
+      }));
+
+      console.log('Actualizado en el frontend:', response.data.recommends);
+    } catch (error) {
+      console.error('Error updating likes/recommends:', error);
+    }
+  };
+
+  const getLikeRecommendCount = (contentId) => {
+    return recommends[contentId] || 0;
+  };
+
+  const getInitialRecommendCount = useCallback(async (contentId) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/get-initial-recommend-counts/${contentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching initial recommend count:', error);
+      return null;
+    }
+  }, [token]);
+
+  // const orderContentsByRecommends = useCallback((contents) => {
+  //   return [...contents].sort((a, b) => {
+  //     const recommendsA = recommends[a._id]?.recommends || 0;
+  //     const recommendsB = recommends[b._id]?.recommends || 0;
+      
+  //     if (recommendsA !== recommendsB) {
+  //       return recommendsA - recommendsB; // Ascendente
+  //     } else {
+  //       return 0; // Mantiene el orden original si los recommends son iguales
+  //     }
+  //   });
+  // }, [recommends]);
 
   useEffect(() => {
     if (filterContents.length > 0) {
@@ -27,16 +91,37 @@ const ContentView = ({ themeId, token, filterContents }) => {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/contentsTotal`, {
             headers: { Authorization: `Bearer ${token}` }
           });
-        setContents(response.data);
-        setFilteredContents(response.data); // Initially, all contents are filtered
+       // Ordena los contenidos directamente basado en el número de recomendations
+       const sortedContents = [...response.data].sort((a, b) => {
+        const recommendsA = a.recommends ? a.recommends.length : 0;
+        const recommendsB = b.recommends ? b.recommends.length : 0;
+        console.log(`Recommends ${a._id}: ${recommendsA}, Recommends ${b._id}: ${recommendsB}`);
+        return recommendsB - recommendsA; // Orden ascendente (más recomendaciones primero)
+      });
+
+      setContents(sortedContents);
+      setFilteredContents(sortedContents);
+
+
+        const initialRecommendCounts = {};
+        for (const content of response.data) {
+          const recommendData = await getInitialRecommendCount(content._id);
+          if (recommendData) {
+            initialRecommendCounts[content._id] = recommendData.recommends;
+          }
+        }
+        setRecommends(initialRecommendCounts);
       } catch (error) {
         console.error('Error fetching contents:', error);
-        setError('Error al obtener todos los contenidos');
+        console.error('Response status:', error.response?.status);
+        console.error('Response data:', error.response?.data);
+        setError(`Error al obtener todos los contenidos: ${JSON.stringify(error.message)}`);
       }
     };
 
     fetchContents();
   }
+  // eslint-disable-next-line
   }, [filterContents, token]);
 
   useEffect(() => {
@@ -172,7 +257,6 @@ const ContentView = ({ themeId, token, filterContents }) => {
       alert(errorMessage);
     }
   };
-  
 
   if (error) {
     return <ErrorText>{error}</ErrorText>;
@@ -234,11 +318,12 @@ const ContentView = ({ themeId, token, filterContents }) => {
               )}
              <ContentInfo>
                   <h4>{content.title}</h4>
+                  <RecommendCounter>{getLikeRecommendCount(content._id)}</RecommendCounter>
               <InfoTop>
-              <LikeButton>
-                  <img src={likeIcon} alt="Me gusta" style={{ width: '25px', marginRight: '5px' }} />
-                  100 Me gusta
-                </LikeButton>
+              <LikeButton onClick={() => updateLikesAndRecommends(content._id, 'recommend')}>
+                <img src={likeIcon} alt="Me gusta" style={{ width: '25px', marginRight: '5px' }} />
+                  Recomendar
+              </LikeButton>
                 <DownloadButton onClick={() => downloadFile(content._id)}>
                   <img src={downloadIcon} alt="Descargar" style={{ width: '25px', marginRight: '5px' }} />
                   Descargar
@@ -387,6 +472,17 @@ const DownloadButton = styled.button`
 const ErrorText = styled.p`
   color: red;
   margin-bottom: 20px;
+`;
+
+const RecommendCounter = styled.div`
+  position: relative;
+  right: 127px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 `;
 
 export default ContentView;
